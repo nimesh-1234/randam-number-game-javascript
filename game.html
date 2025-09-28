@@ -3,28 +3,224 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Guessing Game</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: #fff;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+      }
+
+      .circle {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: float 10s infinite ease-in-out alternate;
+      }
+      .circle:nth-child(1) {
+        width: 200px;
+        height: 200px;
+        background: #ff4b2b;
+        top: 10%;
+        left: 15%;
+        animation-duration: 12s;
+      }
+      .circle:nth-child(2) {
+        width: 150px;
+        height: 150px;
+        background: #6a11cb;
+        top: 70%;
+        left: 70%;
+        animation-duration: 14s;
+      }
+      .circle:nth-child(3) {
+        width: 250px;
+        height: 250px;
+        background: #2575fc;
+        top: 50%;
+        left: -10%;
+        animation-duration: 16s;
+      }
+      @keyframes float {
+        0% {
+          transform: translateY(0) scale(1);
+        }
+        100% {
+          transform: translateY(-50px) scale(1.1);
+        }
+      }
+
+      .game-container {
+        position: relative;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2rem 3rem;
+        border-radius: 20px;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        width: 90%;
+        max-width: 450px;
+        z-index: 2;
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+      }
+
+      p {
+        margin: 0.6rem 0;
+        font-size: 1.1rem;
+      }
+
+      input[type="number"] {
+        padding: 0.7rem;
+        font-size: 1rem;
+        width: 100%;
+        max-width: 250px;
+        border-radius: 12px;
+        border: none;
+        outline: none;
+        margin: 1rem 0;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.8);
+        color: #333;
+      }
+
+      button {
+        padding: 0.8rem 2rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #fff;
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      #message {
+        margin-top: 1rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      #chances {
+        margin-top: 0.5rem;
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    </style>
   </head>
   <body>
-    <p>What Number is Thinking Now?</p>
-    <p>Number Between 1 -10</p>
-    <p><input type="number" id="guess" min="1" max="10" /></p>
-    <button id="guessCheck">Guess</button>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
 
-    <script type="text/javascript">
-      document.getElementById("guessCheck").onclick = function () {
-        var randomNumber = Math.floor(Math.random());
-        randomNumber = randomNumber * 11;
-        randomNumber = Math.floor(randomNumber);
+    <div class="game-container">
+      <h2>🎮 Number Guessing Game</h2>
+      <p>I am thinking of a number between <strong>1 and 1000</strong>.</p>
+      <input
+        type="number"
+        id="guess"
+        min="1"
+        max="1000"
+        placeholder="Enter your guess"
+      />
+      <br />
+      <button id="guessCheck">Submit</button>
 
-        if (document.getElementById("guess").value == randomNumber) {
-          alert("Your Won! The Number is " + randomNumber);
-        } else {
-          alert("Your Lose! The Number is " + randomNumber);
+      <p id="message"></p>
+      <p id="chances"></p>
+    </div>
+
+    <script>
+      let secretNumber;
+      let attempts;
+      let maxAttempts = 10;
+      const button = document.getElementById("guessCheck");
+
+      // Reset Game
+      function newGame() {
+        secretNumber = Math.floor(Math.random() * 1000) + 1;
+        attempts = 1;
+        document.getElementById("message").innerText = "";
+        document.getElementById("chances").innerText = "";
+        document.getElementById("guess").value = "";
+        button.innerText = "Submit";
+        button.onclick = checkGuess;
+      }
+
+      // Check Guess
+      function checkGuess() {
+        let userGuess = parseInt(document.getElementById("guess").value);
+
+        if (isNaN(userGuess) || userGuess < 1 || userGuess > 1000) {
+          document.getElementById("message").innerText =
+            "⚠️ Please enter a number between 1 and 1000.";
+          return;
         }
-      };
 
-      //alert(Math.floor(Math.random() * 10));
+        if (userGuess === secretNumber) {
+          document.getElementById("message").innerText =
+            "🎉 You Win! The secret number was " + secretNumber + ".";
+          button.innerText = "New Game";
+          button.onclick = newGame;
+        } else {
+          if (userGuess < secretNumber) {
+            document.getElementById("message").innerText =
+              "📉 Your guess is too small.";
+          } else {
+            document.getElementById("message").innerText =
+              "📈 Your guess is too large.";
+          }
+
+          attempts++;
+          if (attempts > maxAttempts) {
+            document.getElementById("message").innerText =
+              "😢 You Lose! The correct number was " + secretNumber + ".";
+            button.innerText = "New Game";
+            button.onclick = newGame;
+          } else {
+            document.getElementById("chances").innerText =
+              "🔁 Try again. You have " +
+              (maxAttempts - attempts + 1) +
+              " chances left.";
+          }
+        }
+      }
+
+      //  Start game
+      newGame();
     </script>
   </body>
 </html>
