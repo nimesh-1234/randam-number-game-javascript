@@ -40,5 +40,4 @@ Try it now: [Random Number Game](https://nimesh-1234.github.io/randam-number-gam
 
 ---
 
-## 📂 Folder Structure
 
