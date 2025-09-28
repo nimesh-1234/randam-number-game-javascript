@@ -117,10 +117,42 @@
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
       }
 
-      #message {
+      /* Animated messages */
+      #message-wrapper {
+        position: relative;
+        min-height: 50px;
         margin-top: 1rem;
-        font-size: 1.2rem;
+      }
+
+      #message {
+        display: inline-block;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
         font-weight: bold;
+        font-size: 1.2rem;
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transform: scale(0.8);
+        transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      #message.show {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      #message.win {
+        background: #28a745;
+      }
+      #message.lose {
+        background: #dc3545;
+      }
+      #message.hint {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
       }
 
       #chances {
@@ -159,7 +191,9 @@
       <br />
       <button id="guessCheck">Submit</button>
 
-      <p id="message"></p>
+      <div id="message-wrapper">
+        <p id="message"></p>
+      </div>
       <p id="chances"></p>
     </div>
 
@@ -173,11 +207,23 @@
       function newGame() {
         secretNumber = Math.floor(Math.random() * 1000) + 1;
         attempts = 1;
-        document.getElementById("message").innerText = "";
+        showMessage("", "hint");
         document.getElementById("chances").innerText = "";
         document.getElementById("guess").value = "";
         button.innerText = "Submit";
         button.onclick = checkGuess;
+      }
+
+      // Show animated message
+      function showMessage(text, type = "hint") {
+        const messageEl = document.getElementById("message");
+        messageEl.className = ""; // reset
+        messageEl.classList.add(type); // win, lose, hint
+        messageEl.innerText = text;
+
+        messageEl.classList.remove("show");
+        void messageEl.offsetWidth; // restart animation
+        messageEl.classList.add("show");
       }
 
       // Check Guess
@@ -185,29 +231,30 @@
         let userGuess = parseInt(document.getElementById("guess").value);
 
         if (isNaN(userGuess) || userGuess < 1 || userGuess > 1000) {
-          document.getElementById("message").innerText =
-            "⚠️ Please enter a number between 1 and 1000.";
+          showMessage("⚠️ Please enter a number between 1 and 1000.", "hint");
           return;
         }
 
         if (userGuess === secretNumber) {
-          document.getElementById("message").innerText =
-            "🎉 You Win! The secret number was " + secretNumber + ".";
+          showMessage(
+            "🎉 You Win! The secret number was " + secretNumber + ".",
+            "win"
+          );
           button.innerText = "New Game";
           button.onclick = newGame;
         } else {
           if (userGuess < secretNumber) {
-            document.getElementById("message").innerText =
-              "📉 Your guess is too small.";
+            showMessage("📉 Your guess is too small.", "hint");
           } else {
-            document.getElementById("message").innerText =
-              "📈 Your guess is too large.";
+            showMessage("📈 Your guess is too large.", "hint");
           }
 
           attempts++;
           if (attempts > maxAttempts) {
-            document.getElementById("message").innerText =
-              "😢 You Lose! The correct number was " + secretNumber + ".";
+            showMessage(
+              "😢 You Lose! The correct number was " + secretNumber + ".",
+              "lose"
+            );
             button.innerText = "New Game";
             button.onclick = newGame;
           } else {
@@ -219,7 +266,7 @@
         }
       }
 
-      //  Start game
+      // Start game
       newGame();
     </script>
   </body>
